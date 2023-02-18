@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/UI/style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <meta name="google-signin-client_id" content="789924993075-pmhol8b8bi3ft24ln190643pjbkcqbeo.apps.googleusercontent.com">
+</head>
+    <html>
+        <header>
+            <div class="header">
+                <h1>forum</h1>
+
+                <div class="left-section">
+                <span class="greetings"> ~/login</span>
+                <br>
+                </div>
+
+                <div class="right-section">
+                    <a href="https://localhost:/" class="status-button">Home</a>
+                </div>
+
+                <br><br>
+            </div>
+        </header>
+
+         <body>
+            <!-- Log-in section -->
+            <div class="login-form" >
+                <span class="register-message"> ~/enter your credentials</span>
+                {{if .}}
+                <p class="log-in-error">Invalid username or password</p>
+                {{end}}
+                <form action="/log-in-data" method="POST">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                  
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                  
+                    <input class="status-button"type="submit" value="Log-in">
+
+                    <br><br>
+                    <div class="horizontal-line">
+                        <div class="line left"></div>
+                        <div class="text">or continue with</div>
+                        <div class="line right"></div>
+                      </div>
+                    <div class="ext-login-container">
+                        <a href="https://localhost:/glogin" class="ext-login">
+                            <img src="https://freesvg.org/img/1534129544.png" width="50" height="50">
+                       </a>
+                       <a href="https://localhost:/ghlogin" class="ext-login">
+                           <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" width="50" height="50">
+                      </a>
+                    </div>
+                  </form>
+
+                  <div class="ext-login-container">
+                    Not a User? <a href="https://localhost:/register"><span class="register">Register here</span></a>
+                  </div>
+                  
+            </div>
+         </body>
+         <footer class="other-footer">
+            <div>
+                <span>Copyright © 2023</span>
+                <span>Viktor Veertee & Enri Suimets</span>
+            </div>
+        </footer>
+    </html>
+
+    

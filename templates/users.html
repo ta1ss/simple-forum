@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/UI/style.css">
+    <script src="js.js"></script>
+    {{$url := .refreshPageURL}} 
+</head>
+    <html>
+
+    <header>
+        <div class="header">
+                <h1>forum</h1>
+            <!-- Check if User is logged in -->
+            <div class="left-section">
+            {{if .IsLoggedIn}}
+                {{ range .Session}}
+            <span class="greetings"> Hello, {{ .Username }}</span>
+                {{end}}
+            </div>
+            <!-- Log out button -->
+            <div class="right-section">
+                {{if .hasNotifications}}
+                <div id="notifications" data-url="{{ $url }}">
+                <button onclick="seeNotifications()" class="notification-button">
+                    <img src="media/bell.png" width="60" height="50">
+                </button>
+              </div>
+                {{end}}
+                <form action="/profile" method="POST">
+                    <button type="submit" class="profile">
+                        <img src="https://www.freepnglogos.com/uploads/hacker-png/hacker-interpol-arrests-suspected-anonymous-hackers-motley-5.png" width="45" height="45">
+                    </button>
+                </form>
+                <a href="https://localhost:/" class="status-button">Home</a>
+                <form action="/logout" method="POST">
+                    <button class="status-button" type="submit">Log out</button>
+                </form>
+            </div>
+            {{else}}
+    
+            <!-- If not logged in, show Login and register -->
+            <div class="left-section">
+                <span class="greetings"> Welcome, Guest</span>
+            </div>
+    
+            <div class="right-section">
+                <a href="https://localhost:/login" class="status-button">Login</a>
+                <a href="https://localhost:/register" class="status-button">Register</a>
+            </div>
+            {{end}}
+            <br><br>
+        </div>
+    </header>
+                    
+        <body>
+            <br><br>
+
+            {{ if eq .userType "admin"}}
+            <div class="all-users">
+                <p class="profile-message"> ~/users</p> 
+                <br>
+            {{ range .Users}}
+            <div class="users-card">
+                <p class="all-users-info"><strong>$Username:</strong> <span class="users-value">{{ .Username }}</span></p>
+                <br>
+                <p class="all-users-info"><strong>$Email:</strong><span class="users-value">{{ .Email }}</span></p>
+                <br>
+                <p class="all-users-info"><strong>$Status:</strong><span class="users-value">{{ .Status }}</span></p>
+                <br>
+               <form action="/update-user-status" method="POST">
+                <select name="status" class="users-value" id="status-dropdown">
+                    <option value="user">User</option>
+                    <option value="mod">Moderator</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <input type="hidden" name="id" value="{{ .ID }}">
+                  <input class="users-status-button" type="submit" value="Update">
+               </form>
+                <br>
+            </div>   
+            {{ end }}
+            </div>
+            {{else}}
+            <span class="not-user">Only for awesome people, sorry.</span>
+          {{end}}
+          </body>
+          
+
+          <!-- <footer class="other-footer">
+            <div class="copyright">
+                <span>Copyright © 2023</span>
+                <span>Viktor Veertee & Enri Suimets</span>
+            </div>
+          </footer> -->
+    </html>
+
+    

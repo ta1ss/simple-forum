@@ -1,0 +1,92 @@
+<!DOCTYPE html> 
+<head>
+    <link rel="stylesheet" type="text/css"  href="/UI/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js.js"></script>
+    {{$url := .refreshPageURL}} 
+</head>
+    <html>
+
+    <header>
+      <div class="header">
+          <h1>forum</h1>
+
+          <!-- Check if User is logged in -->
+          <div class="left-section">
+          {{if .IsLoggedIn}}
+              {{ range .Session}}
+          <span class="greetings"> Hello, {{ .Username }}</span>
+              {{end}}
+          </div>
+  
+          <!-- Log out button -->
+          <div class="right-section">
+            {{if .hasNotifications}}
+            <div id="notifications" data-url="{{ $url }}">
+            <button onclick="seeNotifications()" class="notification-button">
+                <img src="media/bell.png" width="60" height="50">
+            </button>
+          </div>
+            {{end}}
+              <form action="/profile" method="POST">
+                  <button type="submit" class="profile">
+                      <img src="https://www.freepnglogos.com/uploads/hacker-png/hacker-interpol-arrests-suspected-anonymous-hackers-motley-5.png" width="45" height="45">
+                  </button>
+              </form>
+              
+              <form action="/logout" method="POST">
+                  <a href="http://localhost:/" class="status-button">Home</a>
+                  <button class="status-button" type="submit">Log out</button>
+              </form>
+          </div>
+  
+          {{else}}
+  
+          <!-- If not logged in, show Login and register -->
+          <div class="left-section">
+              <span class="greetings"> Welcome, Guest</span>
+          </div>
+  
+          <div class="right-section">
+            <a href="https://localhost:/" class="status-button">Home</a>
+              <a href="https://localhost:/login" class="status-button">Login</a>
+              <a href="https://localhost:/register" class="status-button">Register</a>
+          </div>
+          {{end}}
+          <br><br>
+      </div>
+    </header>
+
+
+        <body>
+            {{if .IsLoggedIn}}
+            <div class="create-form" >
+              <p class="profile-message"> ~/touch_new_ticket</p>
+            <form id="create-form" action="/ticket-data" method="POST" enctype="multipart/form-data">
+                <textarea name="body" class="enter-post" rows="10" cols="40" required></textarea>
+                <input type="submit" value="Post">
+                <input type="file" name="fileInput" accept="image/jpeg, image/png, image/gif" id="fileInput" onchange="validateFileSize()">
+              </form>
+            </div>
+            {{else}}
+                <span class="not-user">You need to be logged in to create a ticket</span>
+              {{end}}
+                <script>
+                    function validateFileSize() {
+                      var fileInput = document.getElementById("fileInput");
+                      var fileSize = fileInput.files[0].size;
+                      var maxSize = 20*1024*1024; // 20MB
+                      if (fileSize > maxSize) {
+                        alert("File size should be less than 20MB");
+                        fileInput.value = "";
+                      }
+                    }
+                </script>
+        </body>
+        <footer class="other-footer">
+            <div>
+                <span>Copyright © 2023</span>
+                <span>Viktor Veertee & Enri Suimets</span>
+            </div>
+        </footer>
+    </html>

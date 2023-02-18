@@ -1,0 +1,68 @@
+<!DOCTYPE html> 
+<head>
+    <link rel="stylesheet" type="text/css"  href="/UI/style.css">
+</head>
+    <html>
+        <header>
+            <div class="header">
+                <h1>forum</h1>
+
+                <div class="left-section">
+                <span class="greetings"> ~/register</span>
+                <br>
+                <!-- <span class="message">..enter your credentials</span> -->
+                </div>
+
+                <div class="right-section">
+                    <a href="https://localhost:/" class="status-button">Home</a>
+                </div>
+
+                <br><br>
+            </div>
+        </header>
+
+
+        <body>
+            <div class="register-form" >
+                <span class="register-message"> ~/enter your credentials</span>
+                {{if .}}
+                <p class="log-in-error">Email or username already taken</p>
+                {{end}}
+            <form id="register-form" action="/registerdata" method="POST">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+              
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+              
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+              
+                <input class="register" type="submit" value="Register">
+
+                <br><br>
+                <div class="horizontal-line">
+                    <div class="line left"></div>
+                    <div class="text">or continue with</div>
+                    <div class="line right"></div>
+                  </div>
+                <div class="ext-login-container">
+                    <a href="https://localhost:/glogin" class="ext-login">
+                        <img src="https://freesvg.org/img/1534129544.png" width="50" height="50">
+                   </a>
+                   <a href="https://localhost:/ghlogin" class="ext-login">
+                       <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" width="50" height="50">
+                  </a>
+                </div>
+              </form>
+
+              </form>
+            </div>
+        </body>
+        <footer class="other-footer">
+            <div>
+                <span>Copyright © 2023</span>
+                <span>Viktor Veertee & Enri Suimets</span>
+            </div>
+        </footer>
+    </html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/UI/style.css">
+    <script src="js.js"></script>
+    {{$userType := .userType}}
+</head>
+    <html>
+
+    <header>
+        <div class="header">
+                <h1>forum</h1>
+            <!-- Check if User is logged in -->
+            <div class="left-section">
+            {{if .IsLoggedIn}}
+                {{ range .Session}}
+            <span class="greetings"> Hello, {{ .Username }}</span>
+                {{end}}
+            </div>
+            <!-- Log out button -->
+            <div class="right-section">
+                {{if .hasNotifications}}
+                    <div id="notifications"></div>
+                    <button onclick="seeNotifications('/')" class="notification-button">
+                        <img src="media/bell.png" width="60" height="50">
+                    </button>
+                {{end}}
+                <form action="/profile" method="POST">
+                    <button type="submit" class="profile">
+                        <img src="https://www.freepnglogos.com/uploads/hacker-png/hacker-interpol-arrests-suspected-anonymous-hackers-motley-5.png" width="45" height="45">
+                    </button>
+                </form>
+                <a href="https://localhost:/" class="status-button">Home</a>
+                
+                
+                <form action="/logout" method="POST">
+                    <button class="status-button" type="submit">Log out</button>
+                </form>
+            </div>
+            {{else}}
+    
+            <!-- If not logged in, show Login and register -->
+            <div class="left-section">
+                <span class="greetings"> Welcome, Guest</span>
+            </div>
+    
+            <div class="right-section">
+                <a href="https://localhost:/login" class="status-button">Login</a>
+                <a href="https://localhost:/register" class="status-button">Register</a>
+            </div>
+            {{end}}
+            <br><br>
+        </div>
+    </header>
+                    
+        <body>
+            <br><br>
+        {{if .IsLoggedIn}}
+            {{ if eq $userType "admin"}}
+            <!-- SHOW ALL CATEGORIES -->
+                <div class="cat-show">
+                <p class="profile-message"> ~/Categories</p>
+                {{ range .Categories }}
+                {{ if ne .ID 5}}
+                <div class="cats-name-container">
+                    <p class="cats-name">{{ .Title }}</p>
+                    <!-- DELETE CATEGORIE BUTTON -->
+                    <form method="POST" action="/delete-categorie">
+                        <input type="hidden" name="item_id" value="{{ .ID }}">
+                        <button class="cat-delete-button" type="submit" name="action" value="delete">Delete</button>
+                        </form>
+                </div>
+                {{end}}{{end}}
+                <br>
+                <!-- CREATE NEW CATEGORIE -->
+                <hr>
+                <br><br>
+                <form id="create-form" action="/create-categorie" method="POST">
+                    <p class="profile-message"> touch new_category </p>
+                    <br>
+                    <p class="cat-message">..category_name</p>
+                    <br>
+                    <input class="cat-title" type="title" id="title" name="title" required>
+                    <br>
+                    <p class="cat-message">..category_description</p>
+                    <textarea name="body" class="cat-body" rows="5" cols="2" required></textarea>
+                    <br>
+                    <input class="create-button" type="submit" value="Create">
+                  </form>
+                </div>
+            {{end}}
+                    {{ if ne $userType "admin"}}
+                    <span class="not-user">You need to be an admin to view this content</span>
+                    {{end}}
+        {{else}}
+            <span class="not-user">You need to be an admin to view this content</span>
+        {{end}}
+        </body>
+        <footer class="other-footer">
+            <div>
+                <span>Copyright © 2023</span>
+                <span>Viktor Veertee & Enri Suimets</span>
+            </div>
+        </footer>
+    </html>
+
+    

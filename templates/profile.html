@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/UI/style.css">
+    <script src="js.js"></script>
+    {{$url := .refreshPageURL}} 
+</head>
+    <html>
+
+    <header>
+        <div class="header">
+            <h1>forum</h1>
+
+            <div class="left-section">
+            <span class="greetings"> ~/profile</span>
+            <!-- <br>
+            <span class="message">..your data</span> -->
+            </div>
+
+            <div class="right-section">
+                {{if .hasNotifications}}
+                <div id="notifications" data-url="{{ $url }}">
+                <button onclick="seeNotifications()" class="notification-button">
+                    <img src="media/bell.png" width="60" height="50">
+                </button>
+              </div>
+                {{end}}
+                <a href="https://localhost:/" class="status-button">Home</a>
+                <form action="/logout" method="POST">
+                    <button class="status-button" type="submit">Log out</button>
+                </form>
+            </div>
+
+            <br><br>
+        </div>
+    </header>
+                    
+        <br><br>
+            <body>
+            
+                {{if .IsLoggedIn}}
+                        {{ range .User}}
+                         <div class="profile-user">
+                            <p class="profile-message"> ~/your credentials</p>
+                          <p class="profile-user-info"><strong>$Username:</strong> {{ .Username }}</p>
+                          <br>
+                          <p class="profile-user-info"><strong>$Email:</strong><span id="label">{{ .Email }}</span></p>
+                          <br>
+                         </div>
+                <!-- Display Posts -->
+                <div class="profile-display"> 
+                    <span class="profile-message"> ~/your posts</span>  
+                    {{ if .Posts }}
+                        {{ range .Posts }}
+                        <div class="post">
+                            <h2>>{{ .Title }}</h2>
+                            <p>{{ .Body }}</p>
+                            {{if ne .Media "false"}}
+                            <img src="media/{{ .Media}}" class="posts-media">
+                            <br>
+                            {{end}}
+                            <p class="created-at">Created: {{ .CreatedAt }}</p> 
+                            
+                        </div>
+                        {{end}}
+                        
+                    {{ else }}
+                    <p>You do not have any posts</p>
+                    {{end}}
+                </div>   
+                
+                <!-- Display Comments -->
+                <div class="profile-display">
+                    <span class="profile-message"> ~/your comments</span>
+                    {{ if .Comments }}
+                    {{ range .Comments }}
+                    <div class="post">
+                        <h3>Post:</h3>
+                        <h2>>{{ .PostTitle }}</h2>
+                        <p>{{ .PostBody }}</p>
+                        {{if ne .PostMedia "false"}}
+                        <img src="media/{{ .PostMedia}}" class="posts-media">
+                        <br>
+                        {{end}}
+                        <br>
+                        <h5>Your comment:</h5>
+                        <p>{{ .Body }}</p>
+                        <p class="created-at">Posted: {{ .CreatedAt }}</p>
+                    </div>
+                        {{end}}
+                {{ else }}
+                <p>You do not have any comments</p>
+                {{end}}
+                </div>
+
+
+                <!-- Display Likes -->
+                <div class="profile-display">
+                    <span class="profile-message"> ~/your likes</span>
+                    {{ if .Likes }}
+                        {{ range .Likes }}
+                        <div class="post">
+                            <h2>>{{ .Title }} <img src="https://e7.pngegg.com/pngimages/263/227/png-clipart-man-in-gray-notched-lapel-coat-borat-glasses-at-the-movies-sacha-baron-cohen-thumbnail.png" width="30" height="30" alt="like icon"></h2>
+                        </div>
+                            {{end}}
+                    {{ else }}
+                    <p>You do not have any Likes</p>
+                    {{end}}
+                </div>
+
+                <!-- Display Dislikes -->
+                <div class="profile-display">
+                    <span class="profile-message"> ~/your dislikes</span>
+                    {{ if .DisLikes }}
+                        {{ range .DisLikes }}
+                        <div class="post">
+                            <h2>>{{ .Title }} <img src="https://pngimg.com/d/poop_PNG46.png" width="30" height="30" alt="dislike icon"></h2>
+                        </div>
+                        {{end}}
+                    {{ else }}
+                    <p>You do not have any Dislikes</p>
+                    {{end}}
+                </div>
+                        
+                    {{end}}
+                {{else}}
+                <span class="not-user">You need to be logged in to view your data</span>
+                {{end}}  
+          </body>
+    </html>
+
+    

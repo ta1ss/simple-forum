@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/UI/style.css">
+    <script src="js.js"></script>
+    {{$url := .refreshPageURL}} 
+</head>
+    <html>
+
+    <header>
+        <div class="header">
+                <h1>forum</h1>
+            <!-- Check if User is logged in -->
+            <div class="left-section">
+            {{if .IsLoggedIn}}
+                {{ range .Session}}
+            <span class="greetings"> Hello, {{ .Username }}</span>
+                {{end}}
+            </div>
+            <!-- Log out button -->
+            <div class="right-section">
+                {{if .hasNotifications}}
+                <div id="notifications" data-url="{{ $url }}">
+                <button onclick="seeNotifications()" class="notification-button">
+                    <img src="media/bell.png" width="60" height="50">
+                </button>
+              </div>
+                {{end}}
+                {{ if eq .userType "user"}}
+                <a href="https://localhost:/create-ticket" class="status-button">New ticket</a>
+                <a href="https://localhost:/mod" class="status-button">My tickets</a>
+                {{end}}
+                {{ if eq .userType "mod"}}
+                <a href="https://localhost:/create-ticket" class="status-button">New ticket</a>
+                {{end}}
+                <form action="/profile" method="POST">
+                    <button type="submit" class="profile">
+                        <img src="https://www.freepnglogos.com/uploads/hacker-png/hacker-interpol-arrests-suspected-anonymous-hackers-motley-5.png" width="45" height="45">
+                    </button>
+                </form>
+                {{ if eq .userType "mod"}}
+                <a href="https://localhost:/mod" class="status-button-red">Moderation</a>
+                {{end}}
+                
+                {{ if eq .userType "admin"}}
+                    <a href="https://localhost:/mod" class="status-button-red">Moderation</a>
+                {{ end }}
+                <form action="/logout" method="POST">
+                    <button class="status-button" type="submit">Log out</button>
+                </form>
+            </div>
+            {{else}}
+    
+            <!-- If not logged in, show Login and register -->
+            <div class="left-section">
+                <span class="greetings"> Welcome, Guest</span>
+            </div>
+    
+            <div class="right-section">
+                <a href="https://localhost:/login" class="status-button">Login</a>
+                <a href="https://localhost:/register" class="status-button">Register</a>
+            </div>
+            {{end}}
+            <br><br>
+        </div>
+    </header>
+                    
+        <body>
+            <br><br>
+
+            <!-- Categories -->
+
+            <div class="categories-container">
+                {{ range .Categories }}
+                    {{ if ne .ID 5}}
+                <a href="https://localhost:/content/{{ .ID }}">
+                    <div class="category-card">
+                        <p class="category-title">{{ .Title }}</p>
+                        <p class="category-description">{{ .Description }}</p>
+                    </div>
+                </a>
+                    {{ end }}
+                {{ end }}
+            </div>
+          </body>
+          <footer >
+            <div class="other-footer ">
+                <span>Copyright © 2023</span>
+                <span>Viktor Veertee & Enri Suimets</span>
+            </div>
+          </footer>
+    </html>
+
+    
