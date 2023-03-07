@@ -1,5 +1,6 @@
 package utils
 
+// ! DB TODO
 import (
 	"database/sql"
 	"fmt"

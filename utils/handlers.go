@@ -1,11 +1,10 @@
 package utils
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
+	database "forum/data"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -121,18 +120,9 @@ func RegisterDataHandler(w http.ResponseWriter, r *http.Request) {
 		username := r.PostFormValue("username")
 		hashedpassword, _ := HashPassword(r.PostFormValue("password"))
 
-		db, err := sql.Open("sqlite3", "./data/database.db")
-		if err != nil {
-			http.Error(w, "Error opening database: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		defer db.Close()
-
-		// send the users info to db
 		status := "user"
-		_, err = db.Exec("INSERT INTO customer (email, username, password, status) VALUES (?, ?, ?, ?)", email, username, hashedpassword, status)
+		_, err = database.Exec("INSERT INTO customer (email, username, password, status) VALUES (?, ?, ?, ?)", email, username, hashedpassword, status)
 
-		// database gives error, return
 		if err != nil {
 			fmt.Println("User Failed To Register")
 			fmt.Println(err)
@@ -146,13 +136,10 @@ func RegisterDataHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		} else {
-			// else store user and redirect to login page
-			//Terminal Output
 			fmt.Println("---------------------------------")
-			fmt.Println("User Registration Successful")
+			fmt.Println("User Registered")
 			fmt.Println("Email:", email)
-			fmt.Println("Usernme:", username)
-			fmt.Println("Hashed Password:", hashedpassword)
+			fmt.Println("Username:", username)
 			fmt.Println("---------------------------------")
 			http.Redirect(w, r, "/login", http.StatusFound)
 		}
@@ -203,13 +190,7 @@ func LoginDataHandler(w http.ResponseWriter, r *http.Request) {
 		username := r.PostFormValue("username")
 		password := r.PostFormValue("password")
 
-		db, err := sql.Open("sqlite3", "file:data/database.db")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		defer db.Close()
-		if Login(db, username, password) {
+		if login(username, password) {
 			setSessionCookie(w, username)
 			http.Redirect(w, r, "/", http.StatusFound)
 		} else {
@@ -217,33 +198,18 @@ func LoginDataHandler(w http.ResponseWriter, r *http.Request) {
 			tmpl := template.Must(template.ParseFiles("templates/login.html"))
 			tmpl.Execute(w, data)
 		}
-		//Terminal Output
-		fmt.Printf("User %v - Login Successful\n", username)
-		fmt.Println("---------------------------------")
-
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
 }
 
 func LogOutHandler(w http.ResponseWriter, r *http.Request) {
-	// Get the session ID/username from the request's cookies
 	sessionID, _ := r.Cookie("sessionID")
-	// Delete the user's session from the sessions table in the database
-	db, err := sql.Open("sqlite3", "file:data/database.db")
+	_, err := database.Exec("DELETE FROM sessionIDs WHERE sessionID = ?", sessionID.Value)
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer db.Close()
-
-	_, err = db.Exec("DELETE FROM sessionIDs WHERE sessionID = ?", sessionID.Value)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// Redirect the user to the home page or a login page
 	http.Redirect(w, r, "/", http.StatusFound)
-	fmt.Println("User Logged Out")
 }
 
 func SentCommentHandler(w http.ResponseWriter, r *http.Request) {
@@ -256,14 +222,10 @@ func SentCommentHandler(w http.ResponseWriter, r *http.Request) {
 		comment := r.PostFormValue("comment")
 		user := userIDFromCookie(r)
 		postID := r.PostFormValue("postID")
-		//takes the page address from html in order to return the user back to where they posted comment
+
 		refreshpage := r.PostFormValue("url")
 		AddComment(comment, postID, user, w)
 		http.Redirect(w, r, refreshpage, http.StatusSeeOther)
-		//Terminal Output
-		fmt.Println("Comment:", comment)
-		fmt.Println("---------------------------------")
-
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
@@ -277,13 +239,6 @@ func ReceiveLikesHandler(w http.ResponseWriter, r *http.Request) {
 		action := r.FormValue("action")
 		item_type := r.FormValue("item_type")
 
-		db, err := sql.Open("sqlite3", "file:data/database.db")
-		if err != nil {
-			http.Error(w, "Error opening database: "+err.Error(), http.StatusInternalServerError)
-		}
-		defer db.Close()
-
-		//check if like/dislike went on post or comment
 		var col string
 		if item_type == "post" {
 			col = "posts"
@@ -296,10 +251,6 @@ func ReceiveLikesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		refreshpage := r.PostFormValue("url")
 		http.Redirect(w, r, refreshpage, http.StatusSeeOther)
-		//Terminal Output
-		fmt.Printf("%v %vd \n", strings.Title(item_type), strings.Title(action))
-		fmt.Println("---------------------------------")
-
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
@@ -327,12 +278,6 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		AddCategories(postID, categories, w)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-
-		//Terminal Output
-		fmt.Println("Post Creation Successful")
-		fmt.Println("Title:", title)
-		fmt.Println("Body:", body)
-		fmt.Println("---------------------------------")
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
@@ -349,7 +294,6 @@ func DeleteCommentHandler(w http.ResponseWriter, r *http.Request) {
 		user := userIDFromCookie(r)
 		DeleteComment(commentID, user, w)
 		http.Redirect(w, r, url, http.StatusSeeOther)
-
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
@@ -366,7 +310,6 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 		user := userIDFromCookie(r)
 		DeletePost(postID, user, w)
 		http.Redirect(w, r, url, http.StatusSeeOther)
-
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
@@ -451,13 +394,8 @@ func userStatusHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		id, _ := strconv.Atoi(r.PostFormValue("id"))
 		status := r.PostFormValue("status")
-		db, err := sql.Open("sqlite3", "file:data/database.db")
-		if err != nil {
-			http.Error(w, "Error opening database: "+err.Error(), http.StatusInternalServerError)
-		}
-		defer db.Close()
-		fmt.Println(id, status)
-		_, err = db.Exec("UPDATE customer SET status = ? WHERE ID = ?", status, id)
+
+		_, err = database.Exec("UPDATE customer SET status = ? WHERE ID = ?", status, id)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -643,17 +581,11 @@ func createCategorieHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 		}
-
 		title := r.FormValue("title")
 		body := r.FormValue("body")
 
 		createCategorie(title, body)
-		fmt.Println("Categorie Creation Successful")
-		fmt.Println("Title:", title)
-		fmt.Println("Body:", body)
-		fmt.Println("---------------------------------")
 		http.Redirect(w, r, "https://localhost/manage-cats", http.StatusSeeOther)
-
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
