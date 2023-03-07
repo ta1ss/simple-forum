@@ -363,6 +363,7 @@ a {
 }
 .posts-title {
   display: inline-block;
+  max-width: 90%;
   font-size: 20px; 
   padding: 8px 12px;
   margin-bottom: 10px;
@@ -370,6 +371,9 @@ a {
   color: #fff;
   border: none;
   font-family: "Courier";
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 .cat-name{
   display: inline-block;
@@ -415,15 +419,20 @@ a {
   margin-bottom: 15px;
   border-radius: 5px;
 }
+
 .posts-media {
   max-width: 200px;
   max-height: 150px;
   object-fit: contain;
 }
 
+
 .posts-description {
   font-size: 20px;
   margin-bottom: 20px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .created-at {
@@ -446,6 +455,9 @@ a {
 .comments-body {
   font-size: 1.2em;
   margin-bottom: 5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 .create-post-button {
   background-color: #030303;
