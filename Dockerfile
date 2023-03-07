@@ -1,9 +1,20 @@
-FROM golang:latest
-COPY . /app
+# Build stage
+FROM golang:alpine as builder
 WORKDIR /app
-RUN go mod download
-RUN apt-get update && apt-get install -y sqlite3
-RUN go build -o forum .
+COPY . .
+RUN apk update && \
+    apk add --no-cache git && \
+    apk add --no-cache build-base && \
+    go mod download && \
+    CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o forum .
+
+# Final stage
+FROM alpine
+WORKDIR /app
+COPY --from=builder /app/forum .
+COPY --from=builder /app/data/database.db ./data/database.db
+COPY --from=builder /app/utils/cert /app/utils/cert
+COPY --from=builder /app/templates /app/templates
+
 EXPOSE 443
-COPY /data/database.db /app/data/database.db
 CMD ["./forum"]
