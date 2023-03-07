@@ -26,11 +26,11 @@
               </div>
                 {{end}}
                 {{ if eq .userType "user"}}
-                <a href="https://localhost:/create-ticket" class="status-button">New ticket</a>
-                <a href="https://localhost:/mod" class="status-button">My tickets</a>
+                <a href="/create-ticket" class="status-button">New ticket</a>
+                <a href="/mod" class="status-button">My tickets</a>
                 {{end}}
                 {{ if eq .userType "mod"}}
-                <a href="https://localhost:/create-ticket" class="status-button">New ticket</a>
+                <a href="/create-ticket" class="status-button">New ticket</a>
                 {{end}}
                 <form action="/profile" method="POST">
                     <button type="submit" class="profile">
@@ -38,11 +38,11 @@
                     </button>
                 </form>
                 {{ if eq .userType "mod"}}
-                <a href="https://localhost:/mod" class="status-button-red">Moderation</a>
+                <a href="/mod" class="status-button-red">Moderation</a>
                 {{end}}
                 
                 {{ if eq .userType "admin"}}
-                    <a href="https://localhost:/mod" class="status-button-red">Moderation</a>
+                    <a href="/mod" class="status-button-red">Moderation</a>
                 {{ end }}
                 <form action="/logout" method="POST">
                     <button class="status-button" type="submit">Log out</button>
@@ -56,8 +56,8 @@
             </div>
     
             <div class="right-section">
-                <a href="https://localhost:/login" class="status-button">Login</a>
-                <a href="https://localhost:/register" class="status-button">Register</a>
+                <a href="/login" class="status-button">Login</a>
+                <a href="/register" class="status-button">Register</a>
             </div>
             {{end}}
             <br><br>
@@ -72,7 +72,7 @@
             <div class="categories-container">
                 {{ range .Categories }}
                     {{ if ne .ID 5}}
-                <a href="https://localhost:/content/{{ .ID }}">
+                <a href="/content/{{ .ID }}">
                     <div class="category-card">
                         <p class="category-title">{{ .Title }}</p>
                         <p class="category-description">{{ .Description }}</p>
