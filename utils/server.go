@@ -9,7 +9,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// global ip counter
 var ipCounter = make(map[string]int)
 
 func RunServer() {
@@ -54,7 +53,6 @@ func RunServer() {
 	mux.HandleFunc("/delete-post", rateLimiter(DeletePostHandler))
 	mux.HandleFunc("/modify-post", rateLimiter(ModifyPostHandler))
 
-	//webpage related
 	mux.HandleFunc("/api/notifications", rateLimiter(NotificationHandler))
 	mux.HandleFunc("/delete-notifications", rateLimiter(DeleteNotificationHandler))
 
@@ -99,7 +97,7 @@ func redirect(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://"+r.Host+r.RequestURI, http.StatusMovedPermanently)
 }
 
-// middleware func that checks how many times the user with this IP has made requests
+// middleware checks how many times the user with this IP has made requests
 func rateLimiter(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := r.RemoteAddr

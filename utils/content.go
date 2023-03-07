@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"database/sql"
 	"fmt"
+	database "forum/data"
 	"net/http"
 )
 
@@ -31,17 +31,24 @@ type Posts struct {
 	Flag           bool
 }
 
+type Users struct {
+	ID       int
+	Username string
+	Email    string
+	Posts    []Posts
+	Comments []Comments
+	Likes    []Likes_Dislikes
+	DisLikes []Likes_Dislikes
+	Status   string
+}
+
 func SessionHandler(r *http.Request) []Sessions {
 	var sessions []Sessions
 	cookie, err := r.Cookie("sessionID")
 	if err != nil {
 		return sessions
 	}
-	db, err := sql.Open("sqlite3", "file:data/database.db")
-	if err != nil {
-		fmt.Println(err)
-	}
-	rows, err := db.Query("SELECT username FROM sessionIDs WHERE sessionID =?", cookie.Value)
+	rows, err := database.Query("SELECT username FROM sessionIDs WHERE sessionID =?", cookie.Value)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -56,11 +63,7 @@ func SessionHandler(r *http.Request) []Sessions {
 }
 
 func CategoriesHandler() []Categories {
-	db, err := sql.Open("sqlite3", "file:data/database.db")
-	if err != nil {
-		fmt.Println(err)
-	}
-	rows, err := db.Query("SELECT ID, title, description FROM categories")
+	rows, err := database.Query("SELECT ID, title, description FROM categories")
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -77,37 +80,21 @@ func CategoriesHandler() []Categories {
 }
 
 func createCategorie(title, body string) {
-	db, err := sql.Open("sqlite3", "file:data/database.db")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("INSERT INTO categories (title, description) VALUES (?, ?)", title, body)
+	_, err := database.Exec("INSERT INTO categories (title, description) VALUES (?, ?)", title, body)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
 func deleteCategorie(catID int) {
-	db, err := sql.Open("sqlite3", "file:data/database.db")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec("DELETE FROM categories WHERE ID = ?", catID)
+	_, err := database.Exec("DELETE FROM categories WHERE ID = ?", catID)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
 func GetContent(categoryID int) []Posts {
-	db, err := sql.Open("sqlite3", "file:data/database.db")
-	if err != nil {
-		fmt.Println(err)
-	}
-	rows, err := db.Query(`SELECT posts.ID, posts.title, posts.body, posts.created, posts.userID, posts.media, posts.flag
+	rows, err := database.Query(`SELECT posts.ID, posts.title, posts.body, posts.created, posts.userID, posts.media, posts.flag
                          FROM postcategories
                          JOIN posts ON postcategories.PostID = posts.ID
                          WHERE postcategories.CategoryID = ?`, categoryID)
@@ -115,7 +102,6 @@ func GetContent(categoryID int) []Posts {
 		fmt.Print(err)
 	}
 
-	// get the all POSTS
 	var posts []Posts
 	for rows.Next() {
 		var post Posts
@@ -123,11 +109,8 @@ func GetContent(categoryID int) []Posts {
 			fmt.Println("failed to read POSTS")
 		}
 
-		// Get the username of the author of the post
 		post.Username = GetUsernameByID(post.UserID)
-
-		// get the COMMENTS(with likes) of the POST
-		post.Comments = GetComments(post.ID)
+		post.Comments = getComments(post.ID)
 		commentsinfo := "commentID"
 
 		for i := range post.Comments {
@@ -135,34 +118,16 @@ func GetContent(categoryID int) []Posts {
 			post.Comments[i].TotalLikes, post.Comments[i].TotalDislikes = CountCommentLikesDislikes(&post.Comments[i])
 		}
 
-		// get likes of the POST
 		postsinfo := "postID"
 		post.Likes_Dislikes = GetLikesDislikes(postsinfo, post.ID)
-		// Count the likes/dislikes
 		post.TotalLikes, post.TotalDislikes = CountPostLikesDislikes(&post)
-
 		posts = append(posts, post)
 	}
 	return posts
 }
 
-type Users struct {
-	ID       int
-	Username string
-	Email    string
-	Posts    []Posts
-	Comments []Comments
-	Likes    []Likes_Dislikes
-	DisLikes []Likes_Dislikes
-	Status   string
-}
-
 func getUsers() []Users {
-	db, err := sql.Open("sqlite3", "file:data/database.db")
-	if err != nil {
-		fmt.Println(err)
-	}
-	rows, err := db.Query("SELECT ID, username, email, status FROM customer")
+	rows, err := database.Query("SELECT ID, username, email, status FROM customer")
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -180,23 +145,16 @@ func getUsers() []Users {
 }
 
 func GetProfile(usrID string, userIDint int) []Users {
-	db, err := sql.Open("sqlite3", "file:data/database.db")
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	var users []Users
 	var user Users
 
-	// get the userdata
-	err = db.QueryRow("SELECT ID, username, email FROM customer where ID = ?", usrID).Scan(&user.ID, &user.Username, &user.Email)
+	err := database.QueryRow("SELECT ID, username, email FROM customer where ID = ?", usrID).Scan(&user.ID, &user.Username, &user.Email)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	// get posts
-	rows, err := db.Query("SELECT ID, title, body, created, media FROM posts WHERE userID = ?", userIDint)
+	rows, err := database.Query("SELECT ID, title, body, created, media FROM posts WHERE userID = ?", userIDint)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -212,8 +170,7 @@ func GetProfile(usrID string, userIDint int) []Users {
 		user.Posts = append(user.Posts, post)
 	}
 
-	// get the user's comments
-	commentsRows, err := db.Query("SELECT body, creation, postID FROM comments WHERE userID = ?", usrID)
+	commentsRows, err := database.Query("SELECT body, creation, postID FROM comments WHERE userID = ?", usrID)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -229,7 +186,7 @@ func GetProfile(usrID string, userIDint int) []Users {
 		var postTitle string
 		var postBody string
 		var postMedia string
-		err = db.QueryRow("SELECT title, body, media FROM posts WHERE ID = ?", comment.PostID).Scan(&postTitle, &postBody, &postMedia)
+		err = database.QueryRow("SELECT title, body, media FROM posts WHERE ID = ?", comment.PostID).Scan(&postTitle, &postBody, &postMedia)
 		if err != nil {
 			fmt.Println(err)
 			return nil
@@ -240,8 +197,7 @@ func GetProfile(usrID string, userIDint int) []Users {
 		user.Comments = append(user.Comments, comment)
 	}
 
-	// get user's liked posts
-	likedPostRows, err := db.Query("SELECT postID FROM likes_dislikes WHERE userID = ? and type = 'like' and item_type = 'posts'", usrID)
+	likedPostRows, err := database.Query("SELECT postID FROM likes_dislikes WHERE userID = ? and type = 'like' and item_type = 'posts'", usrID)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -253,9 +209,9 @@ func GetProfile(usrID string, userIDint int) []Users {
 			fmt.Println(err)
 			return nil
 		}
-		// get liked post title
+
 		var title string
-		err := db.QueryRow("SELECT title FROM posts WHERE ID = ?", likedPost.PostID).Scan(&title)
+		err := database.QueryRow("SELECT title FROM posts WHERE ID = ?", likedPost.PostID).Scan(&title)
 		if err != nil {
 			fmt.Println(err)
 			return nil
@@ -264,8 +220,7 @@ func GetProfile(usrID string, userIDint int) []Users {
 		user.Likes = append(user.Likes, likedPost)
 	}
 
-	// get user's Disliked posts
-	DislikedPostRows, err := db.Query("SELECT postID FROM likes_dislikes WHERE userID = ? and type = 'dislike' and item_type = 'posts'", usrID)
+	DislikedPostRows, err := database.Query("SELECT postID FROM likes_dislikes WHERE userID = ? and type = 'dislike' and item_type = 'posts'", usrID)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -277,9 +232,8 @@ func GetProfile(usrID string, userIDint int) []Users {
 			fmt.Println(err)
 			return nil
 		}
-		// get liked post title
 		var title string
-		err := db.QueryRow("SELECT title FROM posts WHERE ID = ?", likedPost.PostID).Scan(&title)
+		err := database.QueryRow("SELECT title FROM posts WHERE ID = ?", likedPost.PostID).Scan(&title)
 		if err != nil {
 			fmt.Println(err)
 			return nil
@@ -287,13 +241,6 @@ func GetProfile(usrID string, userIDint int) []Users {
 		likedPost.Title = title
 		user.DisLikes = append(user.DisLikes, likedPost)
 	}
-
-	// if len(user.Likes) > 0 {
-	// 	fmt.Println("liked posts found")
-	// } else {
-	// 	fmt.Println("No liked found")
-	// }
-
 	users = append(users, user)
 	return users
 }
