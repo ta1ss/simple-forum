@@ -16,7 +16,7 @@ var (
 	githubOauthConfig = &oauth2.Config{
 		ClientID:     "de61cc110026ec3b4a3a",
 		ClientSecret: "92fd55bf30bbc5570ea775e67247a0c74c631244",
-		RedirectURL:  "https://localhost/ghcallback",
+		RedirectURL:  "https://176.112.158.14:8443/ghcallback",
 		Scopes:       []string{"user:email", "user"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://github.com/login/oauth/authorize",

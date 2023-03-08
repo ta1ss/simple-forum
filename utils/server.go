@@ -71,14 +71,14 @@ func RunServer() {
 	mux.HandleFunc("/content/", rateLimiter(contentHandler))
 
 	go func() {
-		if err := http.ListenAndServe(":80", http.HandlerFunc(redirect)); err != nil {
+		if err := http.ListenAndServe(":8081", http.HandlerFunc(redirect)); err != nil {
 			log.Fatalf("ListenAndServe error: %v", err)
 		}
 	}()
 
 	// Set timeouts
 	server := &http.Server{
-		Addr:         ":443",
+		Addr:         ":8443",
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
@@ -88,7 +88,7 @@ func RunServer() {
 	cert := "utils/cert/server.crt"
 	key := "utils/cert/server.key"
 
-	fmt.Println("Server started at https://localhost:443/")
+	fmt.Println("Server started on port 8443")
 	log.Fatal(server.ListenAndServeTLS(cert, key))
 }
 
