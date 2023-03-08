@@ -5,13 +5,13 @@
 As a final project of Golang branch, the purpose of this task was to build a forum using **Go** as a main language. 
 
 ### Implemented features:
-+ Users can create posts, comments and like/dislike other peoples content
-+ Ability to log-in/register with a local, ~~Google~~(not working without domain) or GitHub account
-+ Adding images to your post
++ Users can create posts, comments and like/dislike other peoples content.
++ Ability to log-in/register with a local, ~~Google~~(not working without domain) or GitHub account.
++ Adding images to your post.
 + Basic security with encrypting passwords, UUID log-in sessions, HTTPS protocol and rate limiting.
-+ Basic moderation system with two advanced account types and a system for flagging and reviewing content
-+ Notification system for the users
-+ Ability to edit posts and comments after submitting
++ Basic moderation system with two advanced account types and a system for flagging and reviewing content.
++ Notification system for the users.
++ Ability to edit posts and comments after submitting.
 
 
 ### Account types:
