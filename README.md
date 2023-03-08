@@ -18,16 +18,14 @@ Account types:
 + Admin - As above but can also manage the account access rights, for example give moderator rights.
 
 ## How To Run
-For this project, you need to have Docker installed. If you don't have it, you can get it [here](https://www.docker.com/).
-1. Clone the repo
-2. Run the bash script that will take care of building and running the image, as well as stopping and deleting itself after completion. 
- > `bash letsgo.sh`
+The project is hosted on [this IP](https://176.112.158.14:8443/).
+
+NB! It's hosted through a self-generated SSL Certificate for the learning purpose so the connection will be prompted as not secure. 
 
 ## Implementation
 - Backend: `Golang`
-- Frontend: `HTML` & `CSS` & `JS`
+- Frontend: `HTML` & `CSS`
 - Database: `Sqlite3`
-- Container service: `Docker`
 
 ## Authors
 *Viktor Veertee* & *Enri Suimets*
