@@ -2,7 +2,7 @@
 >tl;dr --> [link to website](https://176.112.158.14:8443/)
 
 
-As a final project of ==Golang branch==, the purpose of this task was to build a forum using **Go** as a main language. 
+As a final project of Golang branch, the purpose of this task was to build a forum using **Go** as a main language. 
 
 ### Implemented features:
 + Users can create posts, comments and like/dislike other peoples content
