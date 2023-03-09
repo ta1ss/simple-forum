@@ -5,7 +5,9 @@ import (
 	"fmt"
 	database "forum/data"
 	"html/template"
+	"mime"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -261,21 +263,40 @@ func NewPostHandler(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseMultipartForm(32 << 20)
 		if err != nil {
 			http.Error(w, "Error parsing form data", http.StatusBadRequest)
+			return
 		}
+
 		title := r.PostFormValue("title")
 		body := r.PostFormValue("body")
 		userID := userIDFromCookie(r)
 		categories := r.Form["topic[]"]
+
 		file, header, err := r.FormFile("fileInput")
 		fileName := "false"
 		if err == nil {
+			// Check file extension
+			ext := filepath.Ext(header.Filename)
+			if ext != ".jpg" && ext != ".png" && ext != ".gif" {
+				http.Error(w, "File type not allowed. Only JPG, PNG, and GIF are allowed.", http.StatusBadRequest)
+				return
+			}
+			// Check MIME type
+			mimeType := mime.TypeByExtension(ext)
+			if mimeType != "image/jpeg" && mimeType != "image/png" && mimeType != "image/gif" {
+				http.Error(w, "File type not allowed. Only JPG, PNG, and GIF are allowed.", http.StatusBadRequest)
+				return
+			}
+
 			fileName = header.Filename
 			AddMedia(fileName, file)
 		}
+
 		postID, err := AddPost(title, body, fileName, userID, w)
 		if err != nil {
 			fmt.Println(err)
+			return
 		}
+
 		AddCategories(postID, categories, w)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
